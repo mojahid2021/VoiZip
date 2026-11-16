@@ -2,6 +2,11 @@
 
 All notable changes to VoiZip. Each version is also published as a [GitHub Release](https://github.com/mojahid2021/VoiZip/releases), which the website reads.
 
+## 1.0.2 - 2026-11-17
+
+### Fixes
+- WhatsApp, Telegram and other calling apps no longer open the VoiZip call screen when you make or receive a call with them
+
 ## 1.0.1 - 2026-11-16
 
 ### App updates
