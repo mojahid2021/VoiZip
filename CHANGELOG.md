@@ -2,6 +2,54 @@
 
 All notable changes to VoiZip. Each version is also published as a [GitHub Release](https://github.com/mojahid2021/VoiZip/releases), which the website reads.
 
+## 2.0.2 - 2026-11-22
+
+### Highlights
+- **Outgoing SIP Calls Fixed on UDP Servers**: Calls no longer time out with `408 Request Timeout`. PJSIP moved INVITEs of 1300 bytes or more to TCP, which UDP-only operator servers refuse; UDP accounts now stay on UDP for every request, as the Linphone-based 1.x builds did.
+- **Clear Voice Instead of Robotic or Choppy Audio**: Audio now goes through Android's Oboe library (AAudio) instead of the old JNI backend, whose late microphone frames were filled with invented audio. PJSIP's own Speex echo canceller is off: it ran on top of the phone's built-in one and distorted the sent voice. Silence suppression (VAD) is off too, so the other side no longer hears dead air.
+- **Linphone-Compatible Call Setup**: Calls now offer what the 1.x (Linphone SDK) builds offered, checked against a recorded Linphone INVITE: no media encryption by default, no ICE or STUN unless set on the account, no session timer, and opus, Speex WB/NB, PCMU and PCMA in Linphone's order, followed by G.722 and G.729.
+- **IPv4 Servers Get IPv4 Addresses**: Turned off NAT64 mode (added in 2.0.1), which put IPv6 addresses in Via, Contact and SDP even for IPv4 servers. Android's CLAT already provides IPv4 on IPv6-only mobile networks.
+- **Incoming Calls Show Reliably**: Setup now requires full-screen call alerts (Android 14+) and keeps the "Incoming calls notifications" channel popping on screen, so an incoming SIP or SIM call opens its screen instead of hiding in a small notification.
+
+### Permissions & Onboarding
+- The permission page now has to be completed: Phone (including call log), Contacts, Microphone, Notifications and Battery must all be allowed before the app opens. Only "Set as default phone app" stays optional. The app checks this at every start and shows the page again if something was turned off.
+- New Battery step asks Android to let VoiZip run in the background, so SIP registration and incoming calls survive with the app closed.
+- Notifications step covers the notification permission, the app-wide switch, full-screen alerts and the incoming-call channel importance, and opens whichever is missing.
+- A permission blocked with "Don't ask again" opens VoiZip's App info page instead of doing nothing.
+- On phones without Android's full-screen alerts screen (some Realme, Xiaomi and Vivo builds), the app falls back to its notification settings, then App info.
+- Back on the permission page closes the app instead of skipping to the main page.
+- Placing a SIP call without microphone access asks for it and then places the call; before, the call button silently did nothing (`PJMEDIA_EAUD_INIT`).
+- Permission diagnostics uses the same checks as the permission page, so both agree on what's missing.
+
+### VoIP & Telecom
+- Built PJSIP with `PJSIP_DONT_SWITCH_TO_TCP` and without rtpmap lines for static payload types, like Linphone.
+- Bundled Oboe 1.9.3 (`liboboe.so`) as PJSIP's default sound device, with low-latency mode off so the phone's echo canceller keeps its reference.
+- Dropped the real-time text stream PJSIP adds to every call by default (voice only).
+- Numbers saved from SIM calls are dialed on the SIP account's server, not on the `sim.invalid` placeholder.
+- TCP and TLS accounts now route calls and subscriptions through the registrar on their own transport, instead of sending calls over UDP.
+- Limited SRTP to one SDES crypto (`AES_CM_128_HMAC_SHA1_80`) when SRTP is chosen, and the "Media encryption" setting now applies to calls.
+- STUN no longer rewrites SIP addresses; SIP uses rport/received. With ICE on, media stays IPv4 so servers that ignore ICE still get a reachable address.
+- UDP keep-alive every 30 s; DTMF falls back to SIP INFO when the other side doesn't take RFC 2833.
+- Supported HA1 credentials with SHA-256 and SHA-512/256 digests.
+- Every call logs the transport and size of its INVITE (`INVITE sent over UDP, N bytes`), so release logs show how calls leave the phone.
+- Fixed thread-safety of call state reads, live call duration, and native cleanup when the engine fails to start.
+
+### App Updates
+- The update check falls back to github.com's latest-release link when the GitHub API rate limit (60 checks per hour per IP, shared by many phones behind one mobile carrier IP) is used up, so the update popup still appears.
+
+### Settings
+- Removed settings that did nothing: start at boot, contact sorting, auto-answer, push notifications, international prefix, "+" to "00", RTP bundle, SMFF recording format, log upload and config viewer.
+- Fixed settings that were not applied: ringtone picker, data saver after restart, proximity sensor switch.
+
+### Data & Reliability
+- Account and call log files are never overwritten with an empty list after a read error.
+- Remote provisioning downloads time out after 15 s.
+
+### Build & Documentation
+- `tools/pjsip/build.sh` downloads Oboe and accepts `PJ_SKIP_FETCH=1` to rebuild from the PJSIP sources already on disk instead of pulling upstream master. The native libraries are not in git: run it before building a release.
+- Added `docs/AUDIT.md` with the project audit and its resolutions.
+
+
 ## 2.0.1 - 2026-11-21
 
 ### Highlights
