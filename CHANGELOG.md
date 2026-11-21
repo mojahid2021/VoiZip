@@ -2,6 +2,41 @@
 
 All notable changes to VoiZip. Each version is also published as a [GitHub Release](https://github.com/mojahid2021/VoiZip/releases), which the website reads.
 
+## 2.0.1 - 2026-11-21
+
+### Highlights
+- **Complete Dark & Light Theme Overhaul**: Fixed invisible contact names in Recents call logs, speed dial favorites, and in-call keypad digits in light mode. Resolved DayNight system synchronization across Android 12+ so the app cleanly matches system and user theme settings without resource mismatches.
+- **Native Dual-Stack IPv4/IPv6 & NAT64**: Enabled native IPv6 compilation in `:pjsua2` and added NAT64 address translation, enabling automatic network handovers between IPv4 Wi-Fi and IPv6 cellular networks without dropping calls.
+- **Crash Fixes**: Resolved fatal `SIGABRT` assertion crash in `pjsua_acc_add` during account login/sync and fixed `NullPointerException` lifecycle leak in `DialpadFragment` window focus listener.
+- **Official Telegram Community Support**: Redesigned the Help & Support page with official VoiZip vector branding and added responsive Telegram community banners linking to [https://t.me/voizip](https://t.me/voizip).
+- **Privacy-Preserving Analytics**: Added Firebase Analytics for tracking call quality, SIP registration status, onboarding funnel, and call recording without collecting any PII.
+
+### Calling & Recents
+- Fixed non-missed caller name visibility in light mode by binding names to dynamic theme tokens (`@color/main2_800`).
+- Fixed speed dial favorite contact name text color in light theme.
+- Fixed in-call dialpad digits white-on-white text in light mode by adopting `@color/keypad_digit`.
+- Fixed missed-call badge text contrast on bottom navigation bar in dark mode.
+- Restyled call log line badges (SIM 1, SIM 2, and SIP account usernames) with theme-adaptive background tints and high-contrast text.
+- Standardized Alphabet Indexer and CardBackgroundDecoration with dynamic theme attributes.
+
+### VoIP & Telecom
+- Enabled `#define PJ_HAS_IPV6 1` in `tools/pjsip/build.sh` and recompiled native `libpjsua2.so` binaries.
+- Configured SIP and media IPv6 usage policies with NAT64 support in `PjsuaAccount` and `PjsuaEngine`.
+- Added detection for remote IPv6 RTP addresses in call statistics.
+- Added call lifecycle and duration logging with disconnect cause tracking across SIM and SIP calls.
+- Tracked SRTP encryption status on connected SIP calls.
+
+### UI & Navigation
+- Redesigned Help & Support screen: removed redundant FAQ, updated brand logo to the official VoiZip vector mark, and added the official Telegram Community banner.
+- Added dismissible Telegram community banner to the main Recents page with persistent state.
+- Fixed ViewBinding lifecycle leak in `ThirdPartySipAccountLoginFragment` password toggle observer.
+- Fixed `ViewTreeObserver` window focus listener leak on view detachment in `DialpadFragment`.
+- Replaced dynamic navigation transitions in `AssistantActivity` with programmatic start destination assignment, ensuring seamless onboarding.
+
+### Build & Documentation
+- Updated `tools/pjsip/build.sh` to track upstream PJSIP master with incremental update support and native IPv6 configuration.
+- Added comprehensive native build guide in `docs/PJSIP_BUILD_GUIDE.md` and PJSIP feature matrix in `docs/PJSIP_FEATURE_MATRIX.md`.
+
 ## 2.0.0 - 2026-11-20
 
 ### Highlights
