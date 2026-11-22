@@ -2,6 +2,33 @@
 
 All notable changes to VoiZip. Each version is also published as a [GitHub Release](https://github.com/mojahid2021/VoiZip/releases), which the website reads.
 
+
+## 2.1.0 - 2026-11-23
+
+### Highlights
+- **Google Play Build**: New `play` flavor (`./gradlew bundlePlayRelease`) without the GitHub self-updater and its install permissions; *Updates* opens the Play Store page. The `github` flavor keeps updating itself. See `docs/PLAY_STORE.md` for the Play Console declarations.
+- **Incoming Calls While the Phone Sleeps**: UDP accounts now wake every minute on mobile data and every 90 seconds on Wi-Fi in Doze (exact while-idle alarm, re-armed when the network changes). If the public IP:port the server sees changes between two REGISTERs while the phone sleeps, the NAT dropped the mapping and the interval for that network type shortens by a third, down to 50 s so PJSIP's own 2-byte keep-alive refreshes the carrier's NAT mapping, with a full REGISTER every 10 minutes, TCP/TLS accounts every 10 minutes, and every account re-registers as soon as Doze ends. Before, the carrier's UDP NAT mapping expired while the phone slept and incoming INVITEs were lost.
+- **SIP Transactions Finish on a Sleeping Phone**: Like Linphone, the CPU stays awake during each REGISTER (released on the server's answer) and for 60 s after an incoming INVITE, so the phone can't fall asleep before the call screen opens.
+- **Battery**: The high-performance Wi-Fi lock is held only during calls, not all day by the keep-alive service, so Wi-Fi power saving works while idle. The optional mic/speaker level meter no longer starts an extra poller on each call switch and pauses while the call screen is hidden.
+- **Incoming Call Screen Opens Directly**: As default phone app, VoiZip opens the call screen itself for ringing SIM and SIP calls instead of relying only on the full-screen notification, which Xiaomi, Oppo, Vivo and Tecno builds often drop. New setting *Advanced calls → Always show incoming calls in full screen* (on by default).
+
+### Phone Brand Settings
+- New required onboarding step on Xiaomi, Oppo, Realme, OnePlus, Vivo, Tecno, Infinix, itel, Huawei and Honor, which block the call screen by default.
+- Each tap opens the next page, VoiZip's own page wherever the brand has one: Xiaomi overlay + Other permissions + Autostart; Oppo/Realme autostart + floating windows + notifications; Vivo app permissions + background startup + notifications; Tecno/Infinix autostart + display over other apps + notifications; Huawei/Honor app launch + floating windows + notifications. Falls back to App info when a page is missing.
+- The onboarding card and *Permissions diagnostics* show numbered instructions for this phone's brand and tick the pages already opened.
+
+### Permissions & Onboarding
+- The Battery step also asks for *Alarms & reminders* (Android 14+), needed for the one-minute refresh of UDP accounts. Without it the app falls back to every 10 minutes.
+- Setting VoiZip as the default phone app is now required (skipped on devices without the role); after two refusals the button opens Android's *Default apps* page.
+- Removed "I'll do this later" and the unused tablet permissions layout.
+
+### Play Store Readiness
+- `SCHEDULE_EXACT_ALARM` instead of `USE_EXACT_ALARM`, which Play allows only for alarm and calendar apps.
+- Removed the unused `FOREGROUND_SERVICE_DATA_SYNC` permission.
+- App Bundles build again: ABI splits are turned off while a bundle is built.
+- Build tasks now name the flavor: `assembleGithubDebug`, `assembleGithubRelease`, `bundlePlayRelease`.
+
+
 ## 2.0.2 - 2026-11-22
 
 ### Highlights
